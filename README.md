@@ -1,5 +1,5 @@
-# benchmarking-TGV
-Case files run for benchmarking FASTER and Grace cluster computing facilities for a short paper for PEARC-23 conference.
+# Benchmarking cluster computing facilities
+Test case files and supplementary material for benchmarking FASTER and Grace cluster computing facilities for a short paper for PEARC-23 conference.
 
 ## Description
 
