@@ -42,7 +42,14 @@ LOCAL=
     pip3 install --no-cache-dir botorch pandas matplotlib pyfr
     pip3 uninstall -y pyfr
 
-## Finally, setup PyFR from source
+### Finally, setup PyFR from source
 
     cd /scratch/user/sambit98/github/PyFR/
     python3 setup.py develop
+
+
+## P2P communication between multiple NVIDIA GPUs
+
+The following code was run on one node on the FASTER cluster that was dynamically connected to 16 NVIDIA A100 GPUs. Results of the P2P communicaion/latency benchmarking code is given in file P2P-comm.txt
+
+  https://gist.github.com/joshlk/bbb1aca6e70b11d251886baee6423dcb
