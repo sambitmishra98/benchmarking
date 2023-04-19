@@ -1,0 +1,76 @@
+#!/bin/bash
+
+#SBATCH --reservation=a100x16
+#SBATCH -J "TGV-Bmark-p16"
+#SBATCH --ntasks=16
+#SBATCH --gres=gpu:a100:16
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --cpus-per-gpu=4
+#SBATCH --gpu-bind=closest
+#SBATCH --use-min-nodes
+#SBATCH --time=0-12:00:00
+#SBATCH --output=benchmark-TGV_p16_weak.out
+#SBATCH --no-requeue
+#SBATCH -p gpu
+#SBATCH --mem=0
+#SBATCH --mail-type=BEGIN,FAIL,END
+#SBATCH --mail-user=sambit98@tamu.edu
+
+module purge
+
+    local=/scratch/user/sambit98/.local/
+    export            PATH=$local/bin/:$PATH
+    export           CPATH=$local/include/:$CPATH
+    export          CPPATH=$local/include/:$CPPATH
+    export          LDPATH=$local/lib/:$LDPATH
+    export    LIBRARY_PATH=$local/lib/:$LIBRARY_PATH
+    export LD_LIBRARY_PATH=$local/lib/:$LD_LIBRARY_PATH
+
+    module load foss/2022b
+    module load UCX-CUDA/1.13.1-CUDA-11.8.0
+    module load libffi/3.4.4
+    module load OpenSSL/1.1.1n
+    module load METIS/5.1.0
+    module load HDF5/1.14.0
+    module load SQLite/3.39.4
+    module load bzip2/1.0.8
+
+    . /scratch/user/sambit98/virtual-environments/pyfr-venv/bin/activate
+
+    numnodes=$SLURM_JOB_NUM_NODES
+    mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).*$/\1/')
+    np=$[${SLURM_JOB_NUM_NODES}*${mpi_tasks_per_node}]
+
+python_runner="/scratch/user/sambit98/virtual-environments/pyfr-venv/bin/python3"
+pyfr_runner="/scratch/user/sambit98/virtual-environments/pyfr-venv/bin/pyfr"
+
+mkdir -p /scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/soln/benchmarking-p16_faster_weak/
+cd       /scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/soln/benchmarking-p16_faster_weak/
+
+inif="/scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/configs/benchmark_double_cuda-aware.ini"
+
+echo "Running on master node: `hostname`"
+    echo "Time: `date`"
+    echo "Current directory: `pwd`"
+    echo -e "JobID: $SLURM_JOB_ID\n======"
+    echo -e "\nnumtasks=${SLURM_NTASKS}, numnodes=${SLURM_JOB_NUM_NODES}, mpi_tasks_per_node=${mpi_tasks_per_node} (OMP_NUM_THREADS=$OMP_NUM_THREADS)"
+
+for i in 16
+do
+    for cube in 161 242
+    do 
+    meshf="/scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/_mesh/weak_mesh/p${i}/cube_nx${cube}.pyfrm"; 
+
+    mkdir -p /scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/soln/benchmarking-p16_faster_weak/cuda-aware_nx${cube}-p${i}/; 
+    cd       /scratch/user/sambit98/BENCHMARK/TGV/strong-weak-scaling/soln/benchmarking-p16_faster_weak/cuda-aware_nx${cube}-p${i}/; 
+
+    CMD="time mpirun -n $i $python_runner $pyfr_runner run -b cuda $meshf $inif"; 
+    echo -e "\nExecuting command:\n==================\n$CMD\n"; echo "Time: `date`"
+
+    eval $CMD;
+
+    done
+done
+
+echo -e "\nSimulation ends\n"
