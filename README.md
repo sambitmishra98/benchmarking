@@ -3,8 +3,11 @@ Test case files and supplementary material for benchmarking FASTER and Grace clu
 
 ## Description
 
-This repository contains the case files run on. All meshes were created using a python script from Will Trojak's Github repository:
-  https://github.com/WillTrojak/basic_gmsh
+Two types benchmarking tests were run on FASTER cluster computing facility: 
+1. Benchmarking with a Taylor-Green Vortex breakdown case on PyFR
+2. P2P communication bandwidth/latency test
+
+This repository attempts to provide all details required to replicate the test case on FASTER and Grace facilities. 
 
 The following steps were followed to set up PyFR on FASTER and Grace cluster computing facilities. 
 
@@ -48,8 +51,19 @@ LOCAL=
     python3 setup.py develop
 
 
-# Other benchmarking tests
-## P2P communication between multiple NVIDIA GPUs
+#### Generating hexahedral elements meshes for the TGV case
+
+All meshes were created using a python script from Will Trojak's Github repository:
+  https://github.com/WillTrojak/basic_gmsh
+
+The python script `cube_hex_mesh.py` was run with the following arguements:
+  python3 cube_hex_mesh.py -n 64 -l 3.14159265 
+With the above command, a \pi^3^ length units domain with 64^3^ elements is created.
+
+
+
+## Other benchmarking tests
+### P2P communication between multiple NVIDIA GPUs
 
 The following code was run on one node on the FASTER cluster that was dynamically connected to 16 NVIDIA A100 GPUs. Results of the P2P communicaion/latency benchmarking code is given in file P2P-comm.txt
 
