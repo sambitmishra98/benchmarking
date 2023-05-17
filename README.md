@@ -53,14 +53,13 @@ LOCAL=
 
 #### Generating hexahedral elements meshes for the TGV case
 
-All meshes were created using a python script from Will Trojak's Github repository:
-  https://github.com/WillTrojak/basic_gmsh
+All meshes were created using a python script from Will Trojak's Github repository: https://github.com/WillTrojak/basic_gmsh
 
 The python script `cube_hex_mesh.py` was run with the following arguements:
-  python3 cube_hex_mesh.py -n 64 -l 3.14159265 
-With the above command, a \pi^3^ length units domain with 64^3^ elements is created.
 
+    python3 cube_hex_mesh.py -n 64 -l 3.14159265 
 
+With the above command, a [0,π]³ length units domain with 64³ elements is created.
 
 ## Other benchmarking tests
 ### P2P communication between multiple NVIDIA GPUs
